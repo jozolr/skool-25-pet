@@ -1,10 +1,20 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { TachesController } from 'src/infrastructure/controller/taches-controller';
+import { CreerTacheCommandeHandler } from 'src/application/creer-tache-command';
+import { TacheRepositoryInMemory } from 'src/infrastructure/repository/tache-repository-in-memory'
+import { tacheRepositoryToken } from 'src/domain/tache'
+import { Database } from 'src/infrastructure/repository/database'
 
 @Module({
   imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [TachesController],
+  providers: [
+    CreerTacheCommandeHandler,
+    Database,
+    {
+      provide: tacheRepositoryToken,
+      useClass: TacheRepositoryInMemory
+    },
+  ],
 })
 export class AppModule {}
