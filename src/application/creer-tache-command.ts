@@ -13,9 +13,9 @@ export class CreerTacheCommandeHandler {
     private tacheRepository: Tache.Repository) {
   }
 
-  exécuter(creerTacheCommande: CreerTacheCommande) {
-    const tache = Tache.creer(creerTacheCommande.titre, this.tacheRepository)
-    this.tacheRepository.save(tache)
+  async exécuter(creerTacheCommande: CreerTacheCommande) {
+    const tache = await Tache.creer(creerTacheCommande.titre, this.tacheRepository)
+    await this.tacheRepository.save(tache)
 
     return tache
   }

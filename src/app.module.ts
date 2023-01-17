@@ -1,20 +1,32 @@
 import { Module } from '@nestjs/common';
 import { TachesController } from 'src/infrastructure/controller/taches-controller';
 import { CreerTacheCommandeHandler } from 'src/application/creer-tache-command';
-import { TacheRepositoryInMemory } from 'src/infrastructure/repository/tache-repository-in-memory'
+import { TacheRepositorySql } from 'src/infrastructure/repository/tache-repository-sql'
 import { tacheRepositoryToken } from 'src/domain/tache'
-import { Database } from 'src/infrastructure/repository/database'
+import { ConfigModule } from '@nestjs/config'
+import configuration from 'src/config/configuration'
+import { databaseProviders } from 'src/infrastructure/database/providers'
 
 @Module({
-  imports: [],
+  imports: [
+    ConfigModule.forRoot({
+      envFilePath: '.env',
+      cache: true,
+      load: [configuration]
+    }),
+
+  ],
   controllers: [TachesController],
   providers: [
     CreerTacheCommandeHandler,
-    Database,
     {
       provide: tacheRepositoryToken,
-      useClass: TacheRepositoryInMemory
+      useClass: TacheRepositorySql
     },
+    ...databaseProviders
   ],
+  exports: [
+    ...databaseProviders
+  ]
 })
 export class AppModule {}

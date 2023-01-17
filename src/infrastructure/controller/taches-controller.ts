@@ -1,33 +1,39 @@
 import { Body, Controller, Get, Post } from '@nestjs/common'
 import { CreerTacheCommandeHandler } from 'src/application/creer-tache-command'
 import { Tache } from 'src/domain/tache'
-import { Database } from 'src/infrastructure/repository/database'
-
+import { TacheSqlModel } from 'src/infrastructure/repository/sql-model/tache.sql-model'
+import { ApiProperty, ApiResponse } from '@nestjs/swagger'
 
 class CréerTachePayload {
+  @ApiProperty()
   titre: string
 }
 
 class TacheQueryModel {
+  @ApiProperty()
   titre: string
 }
 
-@Controller()
+@Controller('taches')
 export class TachesController {
   constructor(
-    private readonly créerTacheCommandeHandler: CreerTacheCommandeHandler,
-    private readonly database: Database
+    private readonly créerTacheCommandeHandler: CreerTacheCommandeHandler
   ) {}
 
   @Get()
-  recupererLesTaches(): TacheQueryModel[] {
-    return this.database.taches.map(tache => ({
-      titre: tache.titre
+  @ApiResponse({
+    type: TacheQueryModel,
+    isArray: true
+  })
+  async recupererLesTaches(): Promise<TacheQueryModel[]> {
+    const tachesEntities = await TacheSqlModel.findAll()
+    return tachesEntities.map(tacheEntity => ({
+      titre: tacheEntity.titre
     }))
   }
 
   @Post()
-  créerUneTache(@Body() creerTachePayload: CréerTachePayload): Tache {
+  créerUneTache(@Body() creerTachePayload: CréerTachePayload): Promise<Tache> {
     const creerTacheCommande = { titre: creerTachePayload.titre }
     return this.créerTacheCommandeHandler.exécuter(creerTacheCommande)
   }

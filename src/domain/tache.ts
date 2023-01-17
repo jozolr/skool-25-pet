@@ -9,13 +9,13 @@ export const tacheRepositoryToken = 'TacheRepositoryToken'
 
 export namespace Tache {
   export interface Repository {
-    save(tache: Tache): void
-    getByTitre(titre: string): Tache
-    findAll(): Tache[]
+    save(tache: Tache): Promise<void>
+    getByTitre(titre: string): Promise<Tache | undefined>
+    findAll(): Promise<Tache[]>
   }
 
-  export function creer(titre: string, repository: Repository): Tache {
-    const tacheExistante = repository.getByTitre(titre)
+  export async function creer(titre: string, repository: Repository): Promise<Tache> {
+    const tacheExistante = await repository.getByTitre(titre)
     if (tacheExistante) {
       throw new Error()
     }
